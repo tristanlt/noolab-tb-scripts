@@ -2,6 +2,7 @@
 mysql -u root --password=stack  < nova.sql
 apt-get install -y nova-api nova-cert nova-conductor nova-consoleauth nova-scheduler nova-spiceproxy
 
+cp nova.conf /etc/nova
 
 openstack user create --project service --password nova nova
 openstack role add --user nova --project service admin
@@ -15,6 +16,9 @@ nova internal "http://controller:8774/v2/%(tenant_id)s"
 
 openstack endpoint create --region='RegionOne' \
 nova public "http://controller:8774/v2/%(tenant_id)s"
+
+sudo -u nova nova-manage db sync
+sudo -u nova nova-manage api_db sync
 
 service nova-api restart
 service nova-conductor restart
